@@ -4,6 +4,7 @@ from keras.models import load_model
 import matplotlib.image as processimage
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from PIL import Image
 import sys
 
@@ -23,10 +24,18 @@ class Prediction(object):
         img_open = Image.open(self.predict_file)
         conv_RGB = img_open.convert('RGB')
         new_img = conv_RGB.resize((self.Width,self.Height),Image.BILINEAR)
-        new_img.save(self.predict_file)#覆盖原来的图片
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        name = 'temp.jpeg'
+        basepath = os.path.join(basedir,name)  #裁剪文件路径
+        #print(basepath)
+        orignpath = os.path.join(basedir,self.predict_file)  #原始路径
+        #print(orignpath)
+
+        new_img.save(basepath)#保存新的图片
         #print('Image Processed')
         #处理图片shape
-        image = processimage.imread(self.predict_file)
+        image = processimage.imread(basepath)
         image_to_array = np.array(image)/255.0#转成float
         image_to_array = image_to_array.reshape(-1,100,100,3)
         #print('Image reshaped')
@@ -36,13 +45,23 @@ class Prediction(object):
         Final_prediction = [result.argmax() for result in prediction][0]
         #print(Final_prediction)
 
+        result_list = []
+
         #延伸教程读取概率
         count = 0
         for i in prediction[0]:
             #print(i)
             percentage = '%.2f%%' % (i * 100)
+            result_list.append(self.EQType[count]+percentage)
             print(self.EQType[count],'possibility:' ,percentage)
             count +=1
+
+        #print(os.path.splitext(orignpath))
+        result_str = ' '.join(result_list)      #预测结果
+        (root,ext) = os.path.splitext(orignpath)  #('D:\\PycharmProjects\\EQ_train2\\b', '.jpeg')
+        #os.path.join(root, ' '+result_str+ext)
+        os.rename(orignpath, root+' '+result_str+ext)   #将原始文件重命名
+        #print(result_str)
 
 
     def ShowPredImg(self):
