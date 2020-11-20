@@ -57,10 +57,10 @@ class Prediction(object):
             count +=1
 
         #print(os.path.splitext(orignpath))
-        result_str = ' '.join(result_list)      #预测结果
+        result_str = '_'.join(result_list)      #预测结果
         (root,ext) = os.path.splitext(orignpath)  #('D:\\PycharmProjects\\EQ_train2\\b', '.jpeg')
         #os.path.join(root, ' '+result_str+ext)
-        os.rename(orignpath, root+' '+result_str+ext)   #将原始文件重命名
+        os.rename(orignpath, root+'_'+result_str+ext)   #将原始文件重命名
         #print(result_str)
 
 
